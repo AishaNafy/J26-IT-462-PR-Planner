@@ -19,3 +19,4 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
+    - assets/data/fishpond_dataset_multiclass_2153.csv
