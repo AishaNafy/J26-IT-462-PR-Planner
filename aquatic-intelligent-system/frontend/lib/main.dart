@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'features/disease_detection/assessment_screen.dart';
 
 void main() {
   runApp(const AquaticIntelligentApp());
@@ -33,7 +34,7 @@ class DashboardScreen extends StatelessWidget {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
+          children: [
             Icon(Icons.water_drop, size: 72, color: Colors.teal),
             SizedBox(height: 16),
             Text(
@@ -42,6 +43,14 @@ class DashboardScreen extends StatelessWidget {
             ),
             SizedBox(height: 12),
             Text('Smart aquarium monitoring and automation'),
+            SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const AssessmentScreen()),
+              ),
+              icon: const Icon(Icons.biotech_outlined),
+              label: const Text('Assess fish image'),
+            ),
           ],
         ),
       ),

@@ -29,15 +29,32 @@ aquatic-intelligent-system/
 
 ## Quick Start
 
-1. Copy `.env.example` to `.env` and adjust values.
-2. Start the stack:
+### Fish Image Web Demo
+
+Create the backend environment and install the API plus model runtime dependencies:
 
 ```bash
-docker-compose up --build
+python3 -m venv .venv
+.venv/bin/python -m pip install -r backend/requirements.txt
 ```
 
-3. Access the API at `http://localhost:8000`.
-4. Run the Flutter app using `flutter pub get` and `flutter run`.
+Start FastAPI from the project root:
+
+```bash
+.venv/bin/python -m uvicorn app.main:app --app-dir backend --reload --port 8000
+```
+
+In a second terminal, start the Flutter Web app:
+
+```bash
+cd frontend
+flutter pub get
+flutter run -d chrome --web-port 5000
+```
+
+Open `http://localhost:5000`. The app uploads an image to `POST /disease-detection/predict-image`; the trained ONNX model is in `ml/trained_models/disease/`.
+
+To retrain using the supplied dataset, install the training packages and run the command in [the disease model guide](ml/notebooks/disease/README.md). The local dataset is not stored in this repository.
 
 ## Features
 
