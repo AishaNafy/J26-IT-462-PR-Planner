@@ -21,7 +21,7 @@ class _WaterQualityScreenState extends State<WaterQualityScreen> {
   Map<String, dynamic> _serial = const {};
   Map<String, dynamic>? _reading;
   String? _error;
-  String? _alertedReadingId;
+  String? _alertSignature;
   bool _busy = false;
 
   @override
@@ -56,9 +56,17 @@ class _WaterQualityScreenState extends State<WaterQualityScreen> {
         }
         if (!silent) _error = null;
       });
-      if (reading?['stage'] == 'critical' && reading?['id'] != _alertedReadingId) {
-        _alertedReadingId = reading?['id'] as String?;
-        if (mounted) _showCriticalAlert(reading!);
+      final warnings = reading?['warnings'] as List? ?? const [];
+      final critical = reading?['critical'] as List? ?? const [];
+      final faults = reading?['faults'] as List? ?? const [];
+      if (warnings.isEmpty && critical.isEmpty && faults.isEmpty) {
+        _alertSignature = null;
+      } else {
+        final signature = '${reading?['stage']}|${warnings.join(',')}|${critical.join(',')}|${faults.join(',')}';
+        if (signature != _alertSignature) {
+          _alertSignature = signature;
+          if (mounted && reading != null) _showWaterAlert(reading);
+        }
       }
     } catch (error) {
       if (mounted && !silent) setState(() => _error = error.toString());
@@ -86,18 +94,61 @@ class _WaterQualityScreenState extends State<WaterQualityScreen> {
     }
   }
 
-  Future<void> _showCriticalAlert(Map<String, dynamic> reading) async {
+  Future<void> _showWaterAlert(Map<String, dynamic> reading) async {
+    final stage = reading['stage'] as String?;
+    final critical = reading['critical'] as List? ?? const [];
+    final warnings = reading['warnings'] as List? ?? const [];
+    final faults = reading['faults'] as List? ?? const [];
+    final issueNames = {...critical, ...warnings, ...faults};
+    final parameters = (reading['parameters'] as Map?)?.cast<String, dynamic>() ?? const {};
+    final details = issueNames.map((name) {
+      final key = '$name';
+      final parameter = parameters[key] as Map<String, dynamic>?;
+      final label = switch (key) {
+        'temperature_c' => 'Temperature',
+        'ph' => 'pH',
+        'turbidity' => 'Water clarity',
+        _ => key,
+      };
+      if (parameter == null || parameter['value'] == null) return '$label sensor is not reporting.';
+      final unit = parameter['unit'] == 'relative index' ? ' index' : parameter['unit'] == '°C' ? ' °C' : '';
+      final value = '${parameter['value']}$unit';
+      return '$label is $value. ${_rangeLabel(parameter)}';
+    }).join('\n\n');
+    final isCritical = stage == 'critical';
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        icon: const Icon(Icons.warning_amber_rounded, color: Colors.red),
-        title: const Text('Critical water-quality reading'),
-        content: Text(
-          'Check the tank and sensor calibration now. Critical parameters: ${(reading['critical'] as List).join(', ')}.',
+        icon: Icon(
+          isCritical ? Icons.warning_amber_rounded : Icons.info_outline,
+          color: isCritical ? Colors.red : Colors.orange.shade800,
         ),
+        title: Text(isCritical ? 'Critical water-quality reading' : faults.isNotEmpty && warnings.isEmpty
+            ? 'Water sensor fault'
+            : 'Water-quality warning'),
+        content: Text(details.isEmpty ? 'Review the water-quality readings.' : details),
         actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Review readings'))],
       ),
     );
+  }
+
+  String _rangeLabel(Map<String, dynamic> parameter) {
+    final minimum = parameter['preferred_min'] as num?;
+    final maximum = parameter['preferred_max'] as num?;
+    final criticalMinimum = parameter['critical_min'] as num?;
+    final criticalMaximum = parameter['critical_max'] as num?;
+    final sensorUnit = parameter['unit'] as String?;
+    if (minimum == null || maximum == null) return 'Preferred range unavailable.';
+    if (sensorUnit == 'relative index') {
+      return 'Preferred 0–${maximum.toStringAsFixed(0)} index; critical above ${criticalMaximum?.toStringAsFixed(0) ?? 'n/a'}.';
+    }
+    if (sensorUnit == 'pH') {
+      return 'Preferred pH ${minimum.toStringAsFixed(1)}–${maximum.toStringAsFixed(1)}; '
+          'critical below pH ${criticalMinimum?.toStringAsFixed(1) ?? 'n/a'} or above pH ${criticalMaximum?.toStringAsFixed(1) ?? 'n/a'}.';
+    }
+    final unit = sensorUnit == '°C' ? ' °C' : '';
+    return 'Preferred ${minimum.toStringAsFixed(1)}–${maximum.toStringAsFixed(1)}$unit; '
+        'critical below ${criticalMinimum?.toStringAsFixed(1) ?? 'n/a'} or above ${criticalMaximum?.toStringAsFixed(1) ?? 'n/a'}$unit.';
   }
 
   String _stageLabel(String? stage) => switch (stage) {
@@ -114,7 +165,7 @@ class _WaterQualityScreenState extends State<WaterQualityScreen> {
         _ => Theme.of(context).colorScheme.outline,
       };
 
-  Widget _sensorTile(String key, String title, String value, String effect, String status) {
+  Widget _sensorTile(String title, String value, String effect, String range, String status) {
     final color = status == 'critical'
         ? Theme.of(context).colorScheme.error
         : status == 'warning' || status == 'fault'
@@ -129,6 +180,8 @@ class _WaterQualityScreenState extends State<WaterQualityScreen> {
           Text(value, style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: color)),
           const SizedBox(height: 6),
           Text(status.toUpperCase(), style: Theme.of(context).textTheme.labelSmall?.copyWith(color: color)),
+          const SizedBox(height: 8),
+          Text(range, style: Theme.of(context).textTheme.labelMedium),
           const SizedBox(height: 8),
           Text(effect, style: Theme.of(context).textTheme.bodySmall),
         ]),
@@ -210,14 +263,14 @@ class _WaterQualityScreenState extends State<WaterQualityScreen> {
                   crossAxisCount: columns,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  childAspectRatio: columns == 3 ? 1.15 : 2.0,
+                    childAspectRatio: columns == 3 ? 0.72 : 1.45,
                   children: [
-                    _sensorTile('temperature_c', 'Temperature', temperature?['value'] == null ? 'FAULT' : '${temperature!['value']} °C',
-                        'Affects metabolism, appetite, and oxygen demand.', temperature?['status'] as String? ?? 'fault'),
-                    _sensorTile('ph', 'pH', ph?['value'] == null ? 'FAULT' : '${ph!['value']}',
-                        'Out-of-range or rapid changes can stress skin and gills.', ph?['status'] as String? ?? 'fault'),
-                    _sensorTile('turbidity', 'Water clarity', turbidity?['value'] == null ? 'FAULT' : '${turbidity!['value']} / 100',
-                        'Higher suspended particles can irritate gills. Relative index, not NTU.', turbidity?['status'] as String? ?? 'fault'),
+                    _sensorTile('Temperature', temperature?['value'] == null ? 'FAULT' : '${temperature!['value']} °C',
+                      'Affects metabolism, appetite, and oxygen demand.', _rangeLabel(temperature ?? const {}), temperature?['status'] as String? ?? 'fault'),
+                    _sensorTile('pH', ph?['value'] == null ? 'FAULT' : '${ph!['value']}',
+                      'Out-of-range or rapid changes can stress skin and gills.', _rangeLabel(ph ?? const {}), ph?['status'] as String? ?? 'fault'),
+                    _sensorTile('Water clarity', turbidity?['value'] == null ? 'FAULT' : '${turbidity!['value']} / 100',
+                      'Higher suspended particles can irritate gills. Relative index, not NTU.', _rangeLabel(turbidity ?? const {}), turbidity?['status'] as String? ?? 'fault'),
                   ],
                 );
               }),
