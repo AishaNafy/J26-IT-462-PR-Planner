@@ -159,6 +159,7 @@ def main() -> None:
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     model_path = args.output_dir / "fish_disease.onnx"
+    fish_gate_path = args.output_dir / "fish_presence.onnx"
     torch.onnx.export(
         model,
         torch.zeros(1, 3, 224, 224, device=device),
@@ -167,6 +168,27 @@ def main() -> None:
         output_names=["logits"],
         dynamo=False,
     )
+    fish_gate = models.mobilenet_v3_small(weights=weights).to(device).eval()
+    torch.onnx.export(
+        fish_gate,
+        torch.zeros(1, 3, 224, 224, device=device),
+        fish_gate_path,
+        input_names=["image"],
+        output_names=["imagenet_logits"],
+        dynamo=False,
+    )
+    categories = weights.meta["categories"]
+    fish_names = {
+        "tench", "goldfish", "great white shark", "tiger shark", "hammerhead", "electric ray", "stingray",
+        "eel", "barracouta", "gar", "pike", "coho", "sturgeon", "lionfish", "puffer", "rock beauty",
+    }
+    excluded_names = {"starfish", "jellyfish", "crayfish", "shellfish"}
+    fish_indices = [
+        index
+        for index, name in enumerate(categories)
+        if ("fish" in name.lower() and name.lower() not in excluded_names) or name.lower() in fish_names
+    ]
+    fish_presence_threshold = 0.003
     (args.output_dir / "labels.json").write_text(
         json.dumps(
             {
@@ -175,6 +197,8 @@ def main() -> None:
                 "input_size": 224,
                 "mean": MEAN,
                 "std": STD,
+                "fish_presence_indices": fish_indices,
+                "fish_presence_threshold": fish_presence_threshold,
             },
             indent=2,
         )

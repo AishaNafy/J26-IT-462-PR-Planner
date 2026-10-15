@@ -54,6 +54,12 @@ flutter run -d chrome --web-port 5000
 
 Open `http://localhost:5000`. The app uploads an image to `POST /disease-detection/predict-image`; the trained ONNX model is in `ml/trained_models/disease/`.
 
+From the dashboard, open **Live water quality**, select the `/dev/cu.usbserial-*` ESP32 port, and connect. Close Arduino Serial Monitor first because USB serial can be owned by only one application at a time. The app polls temperature, pH, turbidity index, and probe faults. To use Flutter on a phone, pass the laptop's Wi-Fi IP as `--dart-define=API_BASE_URL=http://<laptop-ip>:8000`; the phone and laptop must be on the same LAN.
+
+Prototype thresholds: preferred 20–30 °C, pH 6.5–8.5, relative turbidity index 0–30; critical <18 or >32 °C, pH <5.5 or >9.5, or turbidity >60. These are generic demonstration ranges, not species-specific veterinary limits. Turbidity is relative, not NTU. The three-stage rule is transparent: Critical for a valid hard-limit breach; Moderate for abnormal image, warning-range value, low image confidence, or any sensor fault; Healthy only when a fish is recognized and all three sensors are valid and in range. Sensor readings are not ML-trained because there are no labeled fish-outcome records for them.
+
+The mobile camera currently captures a still photo, not a continuous video clip. Each photo is analyzed as one frame. Sensor readings are held in memory for the current backend process; they are cleared when the API restarts.
+
 To retrain using the supplied dataset, install the training packages and run the command in [the disease model guide](ml/notebooks/disease/README.md). The local dataset is not stored in this repository.
 
 ## Features
