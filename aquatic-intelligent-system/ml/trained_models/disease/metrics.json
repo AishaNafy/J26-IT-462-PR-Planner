@@ -1,0 +1,16 @@
+{
+  "architecture": "MobileNetV3-Small",
+  "training_images": 30,
+  "class_counts": {
+    "Healthy": 15,
+    "Abnormal": 15
+  },
+  "split_counts": {
+    "train": 20,
+    "validation": 4,
+    "test": 6
+  },
+  "validation_accuracy": 0.75,
+  "test_accuracy": 0.8333333333333334,
+  "warning": "Prototype metrics from 30 images are not clinically reliable."
+}
