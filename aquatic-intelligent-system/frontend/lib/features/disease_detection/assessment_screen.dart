@@ -47,7 +47,19 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
     });
     try {
       final result = await _api.predictFishImage(bytes: bytes, filename: filename);
-      if (mounted) setState(() => _prediction = result);
+      if (!mounted) return;
+      setState(() => _prediction = result);
+      if (result['stage'] == 'critical') {
+        await showDialog<void>(
+          context: context,
+          builder: (context) => AlertDialog(
+            icon: const Icon(Icons.warning_amber_rounded, color: Colors.red),
+            title: const Text('Critical water-quality reading'),
+            content: Text((result['reasons'] as List).join('\n')),
+            actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Review result'))],
+          ),
+        );
+      }
     } catch (error) {
       if (mounted) setState(() => _error = error.toString());
     } finally {
@@ -69,7 +81,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
             children: [
               Text('Fish health', style: theme.textTheme.headlineMedium),
               const SizedBox(height: 8),
-              Text('Upload a clear fish photo for a Healthy / Abnormal baseline.', style: theme.textTheme.bodyLarge),
+              Text('Take or upload a clear fish photo. Non-fish images are rejected.', style: theme.textTheme.bodyLarge),
               const SizedBox(height: 24),
               AspectRatio(
                 aspectRatio: 4 / 3,
@@ -114,14 +126,25 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
               if (_prediction != null) ...[
                 const SizedBox(height: 20),
                 Card(
+                  color: _stageColor(theme, _prediction!['stage'] as String?),
                   child: ListTile(
-                    leading: const Icon(Icons.monitor_heart_outlined),
-                    title: Text('${_prediction!['label']}'),
-                    subtitle: Text(
-                      'Model confidence: ${((_prediction!['confidence'] as num) * 100).toStringAsFixed(1)}%',
-                    ),
+                    leading: Icon(_prediction!['stage'] == 'not_a_fish' ? Icons.hide_image_outlined : Icons.monitor_heart_outlined),
+                    title: Text(_stageTitle(_prediction!['stage'] as String?)),
+                    subtitle: Text(_prediction!['stage'] == 'not_a_fish'
+                        ? 'No fish detected. Retake with one fish clearly visible.'
+                        : '${_prediction!['label']} · image confidence ${((_prediction!['confidence'] as num) * 100).toStringAsFixed(1)}%'),
                   ),
                 ),
+                if (_prediction!['stage'] != 'not_a_fish') ...[
+                  for (final reason in (_prediction!['reasons'] as List? ?? const []))
+                    ListTile(dense: true, leading: const Icon(Icons.info_outline), title: Text('$reason')),
+                  if ((_prediction!['sensor_faults'] as List? ?? const []).isNotEmpty)
+                    ListTile(
+                      dense: true,
+                      leading: Icon(Icons.build_circle_outlined, color: theme.colorScheme.error),
+                      title: Text('Sensor fault: ${(_prediction!['sensor_faults'] as List).join(', ')}'),
+                    ),
+                ],
                 Text('Prototype result only. It is not a veterinary diagnosis.', style: theme.textTheme.bodySmall),
               ],
               if (_error != null) ...[
@@ -134,4 +157,19 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
       ),
     );
   }
+
+  String _stageTitle(String? stage) => switch (stage) {
+        'healthy' => 'Healthy',
+        'moderate' => 'Moderate - review recommended',
+        'critical' => 'Critical - check immediately',
+        'not_a_fish' => 'Fish not detected',
+        _ => 'Assessment unavailable',
+      };
+
+  Color _stageColor(ThemeData theme, String? stage) => switch (stage) {
+        'healthy' => Colors.green.shade100,
+        'moderate' => Colors.orange.shade100,
+        'critical' => theme.colorScheme.errorContainer,
+        _ => theme.colorScheme.surfaceVariant,
+      };
 }

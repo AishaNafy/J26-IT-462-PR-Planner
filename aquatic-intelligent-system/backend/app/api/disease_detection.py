@@ -2,6 +2,8 @@ from fastapi import APIRouter, File, HTTPException, UploadFile, status
 from fastapi.concurrency import run_in_threadpool
 
 from app.ml.disease.image_model import get_classifier
+from app.services.clinical_assessment import combine_assessment
+from app.services.water_quality_service import water_quality_service
 
 router = APIRouter(prefix="/disease-detection", tags=["disease-detection"])
 MAX_IMAGE_BYTES = 10 * 1024 * 1024
@@ -20,7 +22,8 @@ async def predict_image(image: UploadFile = File(...)) -> dict:
     if len(data) > MAX_IMAGE_BYTES:
         raise HTTPException(status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, "Image exceeds the 10 MB limit")
     try:
-        return await run_in_threadpool(get_classifier().predict, data)
+        prediction = await run_in_threadpool(get_classifier().predict, data)
+        return combine_assessment(prediction, water_quality_service.latest())
     except ValueError as exc:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(exc)) from exc
     except RuntimeError as exc:

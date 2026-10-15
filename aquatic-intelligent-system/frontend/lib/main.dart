@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'features/disease_detection/assessment_screen.dart';
+import 'features/water_quality/water_quality_screen.dart';
 
 void main() {
   runApp(const AquaticIntelligentApp());
@@ -50,6 +51,14 @@ class DashboardScreen extends StatelessWidget {
               ),
               icon: const Icon(Icons.biotech_outlined),
               label: const Text('Assess fish image'),
+            ),
+            const SizedBox(height: 12),
+            FilledButton.tonalIcon(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const WaterQualityScreen()),
+              ),
+              icon: const Icon(Icons.water_drop_outlined),
+              label: const Text('Live water quality'),
             ),
           ],
         ),

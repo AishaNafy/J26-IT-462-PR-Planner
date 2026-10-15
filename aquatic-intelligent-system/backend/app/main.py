@@ -11,7 +11,7 @@ from app.api.water_quality import router as water_quality_router
 app = FastAPI(title="Aquatic Intelligent System API", version="1.0.0")
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"https?://(localhost|127\.0\.0.1)(:\d+)?",
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1|10(?:\.\d{1,3}){3}|192\.168(?:\.\d{1,3}){2}|172\.(?:1[6-9]|2\d|3[01])(?:\.\d{1,3}){2})(:\d+)?",
     allow_credentials=False,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
