@@ -1,0 +1,12 @@
+
+# Python virtual environment
+environmental-ml/.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Local datasets - do not upload yet
+environmental-ml/data/
+environmental-ml/pond_iot_2023.csv
+environmental-ml/pond_iot_2023_raw.csv
