@@ -81,7 +81,10 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
             children: [
               Text('Fish health', style: theme.textTheme.headlineMedium),
               const SizedBox(height: 8),
-              Text('Take or upload a clear fish photo. Non-fish images are rejected.', style: theme.textTheme.bodyLarge),
+              Text(
+                'Take or upload a clear fish photo. The result names the identified fish and the predicted disease type.',
+                style: theme.textTheme.bodyLarge,
+              ),
               const SizedBox(height: 24),
               AspectRatio(
                 aspectRatio: 4 / 3,
@@ -132,10 +135,27 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
                     title: Text(_stageTitle(_prediction!['stage'] as String?)),
                     subtitle: Text(_prediction!['stage'] == 'not_a_fish'
                         ? 'No fish detected. Retake with one fish clearly visible.'
-                        : '${_prediction!['label']} · image confidence ${((_prediction!['confidence'] as num) * 100).toStringAsFixed(1)}%'),
+                        : 'Overall stage from the image model and water sensors.'),
                   ),
                 ),
                 if (_prediction!['stage'] != 'not_a_fish') ...[
+                  const SizedBox(height: 12),
+                  Card(
+                    child: ListTile(
+                      leading: const Icon(Icons.set_meal_outlined),
+                      title: const Text('Identified fish'),
+                      subtitle: Text(_fishLine(_prediction!)),
+                    ),
+                  ),
+                  Card(
+                    child: ListTile(
+                      leading: Icon(
+                        _prediction!['condition'] == 'healthy' ? Icons.health_and_safety_outlined : Icons.coronavirus_outlined,
+                      ),
+                      title: const Text('Disease type'),
+                      subtitle: Text(_diseaseLine(_prediction!)),
+                    ),
+                  ),
                   for (final reason in (_prediction!['reasons'] as List? ?? const []))
                     ListTile(dense: true, leading: const Icon(Icons.info_outline), title: Text('$reason')),
                   if ((_prediction!['sensor_faults'] as List? ?? const []).isNotEmpty)
@@ -165,6 +185,35 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
         'not_a_fish' => 'Fish not detected',
         _ => 'Assessment unavailable',
       };
+
+  String _percent(dynamic value) {
+    if (value is! num) return '';
+    return '${(value * 100).toStringAsFixed(1)}%';
+  }
+
+  String _fishLine(Map<String, dynamic> prediction) {
+    final name = (prediction['fish_name'] as String?)?.trim();
+    final confidence = _percent(prediction['fish_class_confidence'] ?? prediction['fish_confidence']);
+    if (name == null || name.isEmpty) {
+      return confidence.isEmpty ? 'Fish detected' : 'Fish detected · presence $confidence';
+    }
+    return confidence.isEmpty ? name : '$name · identity $confidence';
+  }
+
+  String _diseaseLine(Map<String, dynamic> prediction) {
+    final disease = (prediction['disease_name'] as String?)?.trim();
+    final category = (prediction['disease_category'] as String?)?.trim();
+    final confidence = _percent(prediction['confidence']);
+    String labeled;
+    if (disease == null || disease.isEmpty) {
+      labeled = 'Disease type unavailable';
+    } else if (category == null || category.isEmpty) {
+      labeled = disease;
+    } else {
+      labeled = '$disease ($category)';
+    }
+    return confidence.isEmpty ? labeled : '$labeled · image confidence $confidence';
+  }
 
   Color _stageColor(ThemeData theme, String? stage) => switch (stage) {
         'healthy' => Colors.green.shade100,
