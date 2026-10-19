@@ -29,8 +29,20 @@ def evaluate_reading(reading: dict[str, Any]) -> dict[str, Any]:
     critical: list[str] = []
     for name, limits in LIMITS.items():
         value = reading.get(name)
+        threshold_details = {
+            "preferred_min": limits["min"],
+            "preferred_max": limits["max"],
+            "critical_min": limits["critical_min"],
+            "critical_max": limits["critical_max"],
+            "unit": limits["unit"],
+        }
         if value is None:
-            parameters[name] = {"value": None, "status": "fault", "message": f"{name} sensor is not reporting"}
+            parameters[name] = {
+                "value": None,
+                "status": "fault",
+                "message": f"{name} sensor is not reporting",
+                **threshold_details,
+            }
             faults.append(name)
             continue
 
@@ -42,7 +54,7 @@ def evaluate_reading(reading: dict[str, Any]) -> dict[str, Any]:
             is_critical = value < limits["critical_min"] or value > limits["critical_max"]
 
         state = "normal" if normal else "critical" if is_critical else "warning"
-        parameters[name] = {"value": value, "status": state, "message": EFFECTS[name]}
+        parameters[name] = {"value": value, "status": state, "message": EFFECTS[name], **threshold_details}
         if state == "critical":
             critical.append(name)
         elif state == "warning":

@@ -35,6 +35,16 @@ def test_healthy_requires_fish_and_all_three_normal_sensors():
     assert combine_assessment(prediction, evaluated)["stage"] == "healthy"
 
 
+def test_warning_readings_include_preferred_and_critical_ranges():
+    result = evaluate_reading({"temperature_c": 31.0, "ph": 6.0, "turbidity": 35.0})
+
+    assert result["stage"] == "moderate"
+    assert result["warnings"] == ["temperature_c", "ph", "turbidity"]
+    assert result["parameters"]["ph"]["preferred_min"] == 6.5
+    assert result["parameters"]["ph"]["critical_min"] == 5.5
+    assert result["parameters"]["turbidity"]["unit"] == "relative index"
+
+
 def test_critical_sensor_result_escalates_fish_assessment():
     reading = {"temperature_c": 35.0, "ph": 7.1, "turbidity": 8.0}
     evaluated = {**reading, **evaluate_reading(reading)}

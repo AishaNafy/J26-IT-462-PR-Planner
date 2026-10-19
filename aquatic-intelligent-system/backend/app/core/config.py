@@ -14,4 +14,16 @@ ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
 DISEASE_MODEL_PATH = Path(os.getenv("DISEASE_MODEL_PATH", BASE_DIR.parent / "ml" / "trained_models" / "disease" / "fish_disease.onnx"))
 DISEASE_LABELS_PATH = Path(os.getenv("DISEASE_LABELS_PATH", BASE_DIR.parent / "ml" / "trained_models" / "disease" / "labels.json"))
+DISEASE_7CLASS_MODEL_PATH = Path(
+    os.getenv(
+        "DISEASE_7CLASS_MODEL_PATH",
+        BASE_DIR.parent / "ml" / "trained_models" / "disease" / "fish_7class" / "fish_disease_7class.onnx",
+    )
+)
+DISEASE_7CLASS_LABELS_PATH = Path(
+    os.getenv(
+        "DISEASE_7CLASS_LABELS_PATH",
+        BASE_DIR.parent / "ml" / "trained_models" / "disease" / "fish_7class" / "labels.json",
+    )
+)
 DEVICE_API_KEY = os.getenv("DEVICE_API_KEY", "")

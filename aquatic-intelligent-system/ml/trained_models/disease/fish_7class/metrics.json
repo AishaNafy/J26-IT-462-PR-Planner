@@ -1,0 +1,152 @@
+{
+  "architecture": "MobileNetV3-Small fine-tuned from ImageNet weights",
+  "dataset": "Saon110, BD Fish & Shrimp Disease Dataset",
+  "dataset_license": "CC BY-NC-SA 4.0",
+  "seed": 42,
+  "device": "mps",
+  "best_epoch": 19,
+  "class_counts": {
+    "train": {
+      "Fish_Bacterial Red disease": 207,
+      "Fish_Bacterial diseases - Aeromoniasis": 207,
+      "Fish_Bacterial gill disease": 203,
+      "Fish_Fungal diseases Saprolegniasis": 205,
+      "Fish_Healthy Fish": 210,
+      "Fish_Parasitic diseases": 212,
+      "Fish_Viral diseases White tail disease": 212
+    },
+    "valid": {
+      "Fish_Bacterial Red disease": 59,
+      "Fish_Bacterial diseases - Aeromoniasis": 59,
+      "Fish_Bacterial gill disease": 58,
+      "Fish_Fungal diseases Saprolegniasis": 58,
+      "Fish_Healthy Fish": 60,
+      "Fish_Parasitic diseases": 60,
+      "Fish_Viral diseases White tail disease": 60
+    },
+    "test": {
+      "Fish_Bacterial Red disease": 31,
+      "Fish_Bacterial diseases - Aeromoniasis": 30,
+      "Fish_Bacterial gill disease": 29,
+      "Fish_Fungal diseases Saprolegniasis": 30,
+      "Fish_Healthy Fish": 30,
+      "Fish_Parasitic diseases": 31,
+      "Fish_Viral diseases White tail disease": 31
+    }
+  },
+  "split_counts": {
+    "train": 1456,
+    "valid": 414,
+    "test": 212
+  },
+  "validation_macro_f1_at_best_epoch": 0.9640364769705269,
+  "test_metrics_all_fish": {
+    "accuracy": 0.9339622641509434,
+    "macro_f1": 0.9338418224702426,
+    "per_class": {
+      "Fish_Bacterial Red disease": {
+        "precision": 0.8857142857142857,
+        "recall": 1.0,
+        "f1": 0.9393939393939393
+      },
+      "Fish_Bacterial diseases - Aeromoniasis": {
+        "precision": 0.9032258064516129,
+        "recall": 0.9333333333333333,
+        "f1": 0.9180327868852459
+      },
+      "Fish_Bacterial gill disease": {
+        "precision": 0.9032258064516129,
+        "recall": 0.9655172413793104,
+        "f1": 0.9333333333333333
+      },
+      "Fish_Fungal diseases Saprolegniasis": {
+        "precision": 0.9655172413793104,
+        "recall": 0.9333333333333333,
+        "f1": 0.9491525423728815
+      },
+      "Fish_Healthy Fish": {
+        "precision": 0.9666666666666667,
+        "recall": 0.9666666666666667,
+        "f1": 0.9666666666666667
+      },
+      "Fish_Parasitic diseases": {
+        "precision": 0.9333333333333333,
+        "recall": 0.9032258064516129,
+        "f1": 0.9180327868852459
+      },
+      "Fish_Viral diseases White tail disease": {
+        "precision": 1.0,
+        "recall": 0.8387096774193549,
+        "f1": 0.9122807017543859
+      }
+    },
+    "confusion_matrix": [
+      [
+        31,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        28,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        28,
+        0,
+        0,
+        1,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        28,
+        0,
+        1,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        1,
+        29,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        2,
+        0,
+        0,
+        28,
+        0
+      ],
+      [
+        2,
+        2,
+        1,
+        0,
+        0,
+        0,
+        26
+      ]
+    ]
+  },
+  "individual_test_predictions": 30,
+  "individual_test_accuracy": 0.9,
+  "limitations": "Research prototype, not a clinical diagnostic. The 30 individual predictions are a small, stratified sample; use the full held-out test metrics for a less noisy estimate."
+}

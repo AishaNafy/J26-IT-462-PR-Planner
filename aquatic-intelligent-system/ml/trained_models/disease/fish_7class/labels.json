@@ -1,0 +1,22 @@
+{
+  "labels": [
+    "Fish_Bacterial Red disease",
+    "Fish_Bacterial diseases - Aeromoniasis",
+    "Fish_Bacterial gill disease",
+    "Fish_Fungal diseases Saprolegniasis",
+    "Fish_Healthy Fish",
+    "Fish_Parasitic diseases",
+    "Fish_Viral diseases White tail disease"
+  ],
+  "input_size": 224,
+  "mean": [
+    0.485,
+    0.456,
+    0.406
+  ],
+  "std": [
+    0.229,
+    0.224,
+    0.225
+  ]
+}

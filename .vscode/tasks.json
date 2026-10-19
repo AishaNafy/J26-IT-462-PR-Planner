@@ -1,0 +1,19 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Aquatic API",
+			"type": "shell",
+			"command": "aquatic-intelligent-system/.venv/bin/python -m uvicorn app.main:app --app-dir aquatic-intelligent-system/backend --host 0.0.0.0 --port 8000 --no-access-log",
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "Aquatic Web App",
+			"type": "shell",
+			"command": "cd aquatic-intelligent-system/frontend && flutter run -d web-server --web-hostname 0.0.0.0 --web-port 8081 --dart-define=API_BASE_URL=http://localhost:8000",
+			"isBackground": true,
+			"problemMatcher": []
+		}
+	]
+}

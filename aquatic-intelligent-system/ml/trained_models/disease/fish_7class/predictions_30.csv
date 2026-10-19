@@ -1,0 +1,31 @@
+sample,test_split_row,actual,predicted,confidence,correct
+1,204,Fish_Viral diseases White tail disease,Fish_Viral diseases White tail disease,0.9811527729034424,True
+2,61,Fish_Bacterial gill disease,Fish_Bacterial gill disease,0.8953059911727905,True
+3,92,Fish_Fungal diseases Saprolegniasis,Fish_Fungal diseases Saprolegniasis,0.9594816565513611,True
+4,24,Fish_Bacterial Red disease,Fish_Bacterial Red disease,0.9947301149368286,True
+5,103,Fish_Fungal diseases Saprolegniasis,Fish_Fungal diseases Saprolegniasis,0.955563485622406,True
+6,42,Fish_Bacterial diseases - Aeromoniasis,Fish_Healthy Fish,0.44330474734306335,False
+7,129,Fish_Healthy Fish,Fish_Healthy Fish,0.988902747631073,True
+8,10,Fish_Bacterial Red disease,Fish_Bacterial Red disease,0.9554667472839355,True
+9,54,Fish_Bacterial diseases - Aeromoniasis,Fish_Bacterial diseases - Aeromoniasis,0.9580754637718201,True
+10,90,Fish_Fungal diseases Saprolegniasis,Fish_Fungal diseases Saprolegniasis,0.9291985034942627,True
+11,19,Fish_Bacterial Red disease,Fish_Bacterial Red disease,0.9913382530212402,True
+12,187,Fish_Viral diseases White tail disease,Fish_Bacterial gill disease,0.5566130876541138,False
+13,162,Fish_Parasitic diseases,Fish_Parasitic diseases,0.9685996770858765,True
+14,169,Fish_Parasitic diseases,Fish_Parasitic diseases,0.5835588574409485,True
+15,181,Fish_Viral diseases White tail disease,Fish_Viral diseases White tail disease,0.9344310164451599,True
+16,14,Fish_Bacterial Red disease,Fish_Bacterial Red disease,0.9700393080711365,True
+17,202,Fish_Viral diseases White tail disease,Fish_Viral diseases White tail disease,0.9865161180496216,True
+18,114,Fish_Fungal diseases Saprolegniasis,Fish_Fungal diseases Saprolegniasis,0.9808719158172607,True
+19,142,Fish_Healthy Fish,Fish_Fungal diseases Saprolegniasis,0.4871366024017334,False
+20,185,Fish_Viral diseases White tail disease,Fish_Viral diseases White tail disease,0.7815127968788147,True
+21,51,Fish_Bacterial diseases - Aeromoniasis,Fish_Bacterial diseases - Aeromoniasis,0.9731481671333313,True
+22,74,Fish_Bacterial gill disease,Fish_Bacterial gill disease,0.9860066175460815,True
+23,165,Fish_Parasitic diseases,Fish_Parasitic diseases,0.7278692722320557,True
+24,46,Fish_Bacterial diseases - Aeromoniasis,Fish_Bacterial diseases - Aeromoniasis,0.9178537726402283,True
+25,125,Fish_Healthy Fish,Fish_Healthy Fish,0.8838534355163574,True
+26,76,Fish_Bacterial gill disease,Fish_Bacterial gill disease,0.9647896885871887,True
+27,75,Fish_Bacterial gill disease,Fish_Bacterial gill disease,0.9869842529296875,True
+28,45,Fish_Bacterial diseases - Aeromoniasis,Fish_Bacterial diseases - Aeromoniasis,0.9168077111244202,True
+29,141,Fish_Healthy Fish,Fish_Healthy Fish,0.9805032014846802,True
+30,157,Fish_Parasitic diseases,Fish_Parasitic diseases,0.985356867313385,True
