@@ -62,3 +62,16 @@ def test_non_fish_image_is_not_given_a_health_stage():
 
     assert result["stage"] == "not_a_fish"
     assert result["alert"] is not True
+
+
+def test_disease_fields_name_fish_class_and_disease_type():
+    from app.ml.disease.image_model import FishDiseaseClassifier
+
+    category, disease_name, label = FishDiseaseClassifier._disease_fields(
+        "Fish_Bacterial diseases - Aeromoniasis"
+    )
+
+    assert category == "Bacterial"
+    assert disease_name == "Aeromoniasis"
+    assert label == "Bacterial diseases - Aeromoniasis"
+    assert FishDiseaseClassifier._disease_fields("Fish_Healthy Fish")[1] == "No visible disease detected"

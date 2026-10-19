@@ -9,6 +9,38 @@ from PIL import Image, ImageOps
 
 from app.core import config
 
+# ImageNet classes used by the fish-presence gate (indices stored in labels.json).
+IMAGENET_FISH_NAMES = {
+    0: "Tench",
+    1: "Goldfish",
+    2: "Great white shark",
+    3: "Tiger shark",
+    4: "Hammerhead shark",
+    5: "Electric ray",
+    6: "Stingray",
+    389: "Barracouta",
+    390: "Eel",
+    391: "Coho salmon",
+    392: "Rock beauty",
+    393: "Anemonefish",
+    394: "Sturgeon",
+    395: "Gar",
+    396: "Lionfish",
+    397: "Pufferfish",
+}
+
+DISEASE_DISPLAY = {
+    "Fish_Bacterial Red disease": ("Bacterial", "Red disease"),
+    "Fish_Bacterial diseases - Aeromoniasis": ("Bacterial", "Aeromoniasis"),
+    "Fish_Bacterial gill disease": ("Bacterial", "Gill disease"),
+    "Fish_Fungal diseases Saprolegniasis": ("Fungal", "Saprolegniasis"),
+    "Fish_Healthy Fish": ("None", "No visible disease detected"),
+    "Fish_Parasitic diseases": ("Parasitic", "Parasitic disease"),
+    "Fish_Viral diseases White tail disease": ("Viral", "White tail disease"),
+    "Healthy": ("None", "No visible disease detected"),
+    "Abnormal": ("Visual", "Abnormal visual pattern"),
+}
+
 
 class FishDiseaseClassifier:
     def __init__(
@@ -69,6 +101,41 @@ class FishDiseaseClassifier:
     def _is_healthy_label(label: str) -> bool:
         return "healthy" in label.lower()
 
+    @staticmethod
+    def _disease_fields(class_label: str) -> tuple[str, str, str]:
+        category, disease_name = DISEASE_DISPLAY.get(
+            class_label,
+            ("Unknown", FishDiseaseClassifier._display_label(class_label).replace("_", " ")),
+        )
+        return category, disease_name, FishDiseaseClassifier._display_label(class_label)
+
+    def _fish_identity(self, fish_probabilities: np.ndarray | None) -> tuple[str | None, float | None]:
+        if fish_probabilities is None:
+            return "Fish", None
+        indices = [int(index) for index in self._metadata.get("fish_presence_indices", [])]
+        if not indices:
+            return "Fish", None
+        best = max(indices, key=lambda index: float(fish_probabilities[index]))
+        score = round(float(fish_probabilities[best]), 4)
+        # The presence gate is sensitive; only name a species when that class stands out.
+        if score < 0.15:
+            return "Fish", score
+        return IMAGENET_FISH_NAMES.get(best, "Fish"), score
+
+    @staticmethod
+    def _empty_prediction() -> dict:
+        return {
+            "is_fish": False,
+            "fish_name": None,
+            "fish_confidence": None,
+            "label": None,
+            "disease_name": None,
+            "disease_category": None,
+            "condition": None,
+            "confidence": None,
+            "probabilities": {},
+        }
+
     def predict(self, image_bytes: bytes) -> dict:
         try:
             image = Image.open(io.BytesIO(image_bytes))
@@ -91,6 +158,7 @@ class FishDiseaseClassifier:
         tensor = tensor.transpose(2, 0, 1)[None, ...].astype(np.float32)
 
         fish_confidence = None
+        fish_probabilities = None
         if self._fish_gate is not None:
             fish_input = self._fish_gate.get_inputs()[0].name
             fish_logits = self._fish_gate.run(None, {fish_input: tensor})[0][0]
@@ -100,15 +168,11 @@ class FishDiseaseClassifier:
             fish_confidence = float(sum(fish_probabilities[index] for index in fish_indices))
             is_fish = fish_confidence >= float(self._metadata.get("fish_presence_threshold", 0.003))
             if not is_fish:
-                return {
-                    "is_fish": False,
-                    "fish_confidence": round(fish_confidence, 4),
-                    "label": None,
-                    "disease_name": None,
-                    "condition": None,
-                    "confidence": None,
-                    "probabilities": {},
-                }
+                result = self._empty_prediction()
+                result["fish_confidence"] = round(fish_confidence, 4)
+                return result
+
+        fish_name, fish_class_confidence = self._fish_identity(fish_probabilities)
 
         if self._seven_class_session is not None:
             input_name = self._seven_class_session.get_inputs()[0].name
@@ -119,12 +183,15 @@ class FishDiseaseClassifier:
             index = int(np.argmax(probabilities))
             class_label = labels[index]
             healthy = self._is_healthy_label(class_label)
-            display_label = self._display_label(class_label)
+            category, disease_name, display_label = self._disease_fields(class_label)
             return {
                 "is_fish": True,
+                "fish_name": fish_name,
                 "fish_confidence": round(fish_confidence, 4) if fish_confidence is not None else None,
+                "fish_class_confidence": fish_class_confidence,
                 "label": display_label,
-                "disease_name": "No visible disease detected" if healthy else display_label,
+                "disease_name": disease_name,
+                "disease_category": None if healthy else category,
                 "condition": "healthy" if healthy else "disease",
                 "confidence": round(float(probabilities[index]), 4),
                 "probabilities": {
@@ -141,14 +208,18 @@ class FishDiseaseClassifier:
         index = int(np.argmax(probabilities))
         label = labels[index]
         healthy = self._is_healthy_label(label)
+        category, disease_name, display_label = self._disease_fields(label)
         return {
             "is_fish": True,
+            "fish_name": fish_name,
             "fish_confidence": round(fish_confidence, 4) if fish_confidence is not None else None,
-            "label": label,
-            "disease_name": "No visible disease detected" if healthy else "Abnormal visual pattern",
+            "fish_class_confidence": fish_class_confidence,
+            "label": display_label,
+            "disease_name": disease_name,
+            "disease_category": None if healthy else category,
             "condition": "healthy" if healthy else "abnormal",
             "confidence": round(float(probabilities[index]), 4),
-            "probabilities": {label: round(float(prob), 4) for label, prob in zip(labels, probabilities)},
+            "probabilities": {name: round(float(prob), 4) for name, prob in zip(labels, probabilities)},
         }
 
 
