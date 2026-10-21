@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AquaFeed Vision | Smart Aquarium AI</title>
+<link rel="stylesheet" href="/assets/styles.css">
+<script src="/assets/app.js" defer></script>
+</head>
+<body>
+
+<header class="dark-header">
+  <div class="header-inner">
+    <a class="logo" href="#home">
+      <span class="logo-fish">🐠</span>
+      <span><strong>AQUAFEED</strong><small>VISION INTELLIGENCE</small></span>
+    </a>
+    <form id="siteSearch" class="site-search" role="search">
+      <input id="searchInput" aria-label="Search dashboard section" placeholder="Search analysis, feeding, camera...">
+      <button type="submit" aria-label="Search">⌕</button>
+    </form>
+    <div class="header-right"><span class="live-dot"></span> AI RESEARCH LAB <span class="header-avatar">◉</span></div>
+  </div>
+</header>
+
+<nav class="white-nav" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="#home" class="selected">⌂ Home</a>
+    <a href="#studio">◉ Video Studio</a>
+    <a href="#results">▥ AI Analytics</a>
+    <a href="#feeding">♧ Feeding Planner</a>
+    <a href="#insights">✦ How It Works</a>
+    <div class="nav-contact">🐠 Smart Goldfish Monitoring</div>
+  </div>
+</nav>
+
+<main id="home">
+  <section class="hero">
+    <div class="hero-inner">
+      <span class="hero-label">POWERED BY COMPUTER VISION</span>
+      <h1>A smarter world<br>for your <em>goldfish.</em></h1>
+      <p>See their movement. Count every visible fish. Understand daily aquarium activity through beautiful, explainable AI insights.</p>
+      <div class="hero-actions">
+        <a class="orange-btn" href="#studio">Start AI Analysis ↗</a>
+        <a class="glass-btn" href="#feeding">Feeding planner →</a>
+      </div>
+      <div class="hero-stats"><span>◉ YOLO26 OBJECT DETECTION</span><span>◈ REAL-TIME CAMERA INPUT</span></div>
+    </div>
+  </section>
+
+  <div class="promise-strip">
+    <span>✦ Fish detection & counting</span>
+    <span>◈ Motion & quickness</span>
+    <span>♧ Feeding schedule alerts</span>
+    <span>▤ Downloadable reports</span>
+  </div>
+
+  <section class="section intro">
+    <div class="eyebrow">DISCOVER THE INTELLIGENCE</div>
+    <h2>Everything your aquarium needs, <em>beautifully connected.</em></h2>
+    <p>From detailed fish detection to quick feeding reminders — designed to make aquarium monitoring simple.</p>
+  </section>
+
+  <section class="feature-showcase">
+    <div class="feature-overlay">
+      <div class="feature-grid">
+        <a href="#studio" class="feature-tile"><span class="tile-icon">🐟</span><strong>Goldfish Detection</strong><small>Bounding boxes · Fish counting</small><span class="tile-arrow">↗</span></a>
+        <a href="#studio" class="feature-tile"><span class="tile-icon">🎥</span><strong>Live Video Studio</strong><small>Record 30 seconds instantly</small><span class="tile-arrow">↗</span></a>
+        <a href="#results" class="feature-tile"><span class="tile-icon">⚡</span><strong>Swimming Activity</strong><small>Movement & quickness index</small><span class="tile-arrow">↗</span></a>
+        <a href="#feeding" class="feature-tile"><span class="tile-icon">🕒</span><strong>Feeding Alerts</strong><small>Reminders & feeding history</small><span class="tile-arrow">↗</span></a>
+        <a href="#results" class="feature-tile"><span class="tile-icon">📊</span><strong>Behaviour Analytics</strong><small>Understand movement patterns</small><span class="tile-arrow">↗</span></a>
+        <a href="#insights" class="feature-tile"><span class="tile-icon">🌿</span><strong>Research Guide</strong><small>Clear, simple explanations</small><span class="tile-arrow">↗</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="studio">
+    <div class="section-heading">
+      <div><div class="eyebrow">01 / AI VIDEO LABORATORY</div><h2>Video Analysis <em>Studio</em></h2><p>Upload your 30-second aquarium recording or use your camera.</p></div>
+      <span class="section-pill">● YOLO MODEL READY <span id="modelConnected"></span></span>
+    </div>
+
+    <div class="studio-grid">
+      <div class="panel input-panel">
+        <div class="tabs">
+          <button id="uploadTab" class="active" type="button">↥ Upload Video</button>
+          <button id="recordTab" type="button">◉ Live Record</button>
+        </div>
+
+        <div id="uploadSection">
+          <div id="dropZone" class="dropzone">
+            <div class="drop-icon">⇧</div>
+            <h3>Drop your fish video here</h3>
+            <p>Choose a 30-second MP4, AVI, MOV or WEBM</p>
+            <label for="videoInput" class="outline-orange">Browse Files</label>
+            <input type="file" id="videoInput" accept="video/*" hidden>
+          </div>
+        </div>
+
+        <div id="recordSection" hidden>
+          <div class="camera-box">
+            <video id="camera" muted autoplay playsinline></video>
+            <div id="cameraFallback">Camera preview appears here</div>
+          </div>
+          <div class="record-controls">
+            <div class="clock" id="clock">00:30</div>
+            <button id="recordStart" class="orange-btn" type="button">● Start Recording</button>
+            <button id="recordStop" class="red-btn" type="button" hidden>■ Stop</button>
+          </div>
+          <p class="small-note">Allow camera permission. Live recording stops automatically after 30 seconds.</p>
+        </div>
+
+        <div id="videoSelected" class="video-selected" hidden>
+          <div class="selected-top"><b id="filename">Video selected</b><span id="filesize"></span></div>
+          <video id="videoPreview" controls playsinline preload="metadata"></video>
+        </div>
+
+        <div class="setting-header"><h3>Model Settings</h3><span>Personalise your analysis</span></div>
+        <div class="slider-row">
+          <div><strong>YOLO Detection Confidence</strong><small>Lower values detect more fish but may add false boxes</small></div>
+          <span id="confidenceValue">0.25</span>
+        </div>
+        <input type="range" min="0.10" max="0.90" step="0.05" value="0.25" id="confidenceSlider" aria-label="YOLO confidence threshold">
+        <div class="slider-guide"><span>More detections</span><span>Stricter detection</span></div>
+        <div class="slider-row frame-setting"><div><strong>Detection frames</strong><small>More samples are slower, but can give a more representative count</small></div><select id="sampleCount"><option value="12">12 frames — Fast</option><option value="24">24 frames — Balanced</option><option value="36">36 frames — Detailed</option></select></div>
+
+        <button id="analyzeButton" class="analyse-button" type="button" disabled>✦ Analyse Goldfish Video <span>→</span></button>
+        <div id="progressPanel" class="progress-panel" hidden>
+          <div class="progress-title"><span id="progressText">Preparing analysis</span><b id="progressNumber">0%</b></div>
+          <div class="progress-bar"><div id="progressFill"></div></div>
+        </div>
+      </div>
+
+      <div class="studio-right">
+        <article class="dark-feature">
+          <span class="eyebrow">AI ENGINE CONNECTED</span>
+          <h3>Meet your aquarium's<br><em>digital observer.</em></h3>
+          <p>Built around your own trained Goldfish YOLO detector and research motion features.</p>
+          <div class="connection"><span>YOLO Detector</span><b id="statusYolo">CHECKING</b></div>
+          <div class="connection"><span>Motion Dataset</span><b id="statusMotion">CHECKING</b></div>
+          <div class="connection"><span>Behaviour Autoencoder</span><b id="statusAE">CHECKING</b></div>
+        </article>
+        <article class="tip-card"><div class="tip-head">💡 Research Note</div><p>Fish counting and movement are measured by computer vision. Hunger and health cannot be confirmed by YOLO alone. Feeding alerts use your schedule.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section results" id="results">
+    <div class="section-heading"><div><div class="eyebrow">02 / GOLD FISH INTELLIGENCE</div><h2>AI Insights & <em>Results</em></h2><p id="resultsSubtitle">Analyse a recording to unlock your results dashboard.</p></div><div class="report-actions"><button id="downloadReport" type="button" disabled>↓ Download Report</button><button id="downloadJson" type="button" disabled>↧ Data JSON</button></div></div>
+
+    <div id="resultsEmpty" class="empty-results"><span>🐠</span><h3>Your fish intelligence report starts here.</h3><p>Upload or record a video above to see detections, activity, quickness and simple explanations.</p><a class="orange-btn" href="#studio">Analyse a Video ↗</a></div>
+
+    <div id="resultContent" hidden>
+      <div class="kpi-grid">
+        <div class="kpi-card"><div class="kpi-icon blue">🐟</div><div class="kpi-label">VISIBLE FISH COUNT</div><div class="kpi-value" id="fishCount">—</div><div class="kpi-desc" id="fishDescription">YOLO sample median</div></div>
+        <div class="kpi-card"><div class="kpi-icon gold">⚡</div><div class="kpi-label">SWIMMING QUICKNESS INDEX</div><div class="kpi-value"><span id="quickness">—</span><small>/100</small></div><div class="kpi-desc" id="quicknessText">Relative scene movement</div></div>
+        <div class="kpi-card"><div class="kpi-icon green">◈</div><div class="kpi-label">BEHAVIOUR PATTERN</div><div class="kpi-state" id="behaviourText">—</div><div class="kpi-desc">Compared with baseline</div></div>
+        <div class="kpi-card"><div class="kpi-icon pink">♥</div><div class="kpi-label">FISH HEALTH STATUS</div><div class="kpi-state" id="healthText">Not assessed</div><div class="kpi-desc">No clinical diagnosis</div></div>
+      </div>
+
+      <div class="analytics-grid">
+        <article class="panel detection-card">
+          <div class="panel-heading"><div><h3>YOLO Fish Detection</h3><p>Annotated frame with detected fish</p></div><span class="pill-gold">OBJECT DETECTION</span></div>
+          <div id="detectionPlaceholder" class="image-placeholder">Detection image unavailable</div>
+          <img id="detectionImage" alt="YOLO goldfish bounding boxes" hidden>
+          <div class="detection-footer" id="detectionFooter"></div>
+        </article>
+        <article class="panel chart-card">
+          <div class="panel-heading"><div><h3>Swimming Activity</h3><p>Movement variation across the recording</p></div><span class="pill-gold">VIDEO MOTION</span></div>
+          <svg id="activityChart" viewBox="0 0 600 250" preserveAspectRatio="none" aria-label="Movement over time" role="img"></svg>
+          <div class="chart-axis"><span>Start</span><span>Video time →</span><span>End</span></div>
+          <div class="activity-explanation" id="activityExplanation"></div>
+        </article>
+      </div>
+
+      <div class="plain-results">
+        <div class="panel plain-card"><span class="eyebrow">ACTIVITY & SPEED</span><h3>How quickly were the fish moving?</h3><div class="meter"><div id="quicknessBar"></div></div><p id="speedExplanation"></p></div>
+        <div class="panel plain-card"><span class="eyebrow">FEEDING INTELLIGENCE</span><h3>Are the fish hungry?</h3><div class="unknown-pill">NOT VERIFIED BY CURRENT AI</div><p>This video model detects fish and changes in movement. It has not been validated to decide whether fish are hungry. Use the feeding planner below to check their schedule.</p></div>
+      </div>
+
+      <div class="interpretation"><strong>✔ What these results mean</strong><p id="simpleExplanation"></p></div>
+    </div>
+  </section>
+
+  <section class="feeding-area" id="feeding">
+    <div class="feeding-inner">
+      <div class="feeding-copy">
+        <div class="eyebrow">03 / AQUARIUM CARE</div><h2>A gentle reminder,<br><em>right when you need it.</em></h2><p>Set your feeding schedule, receive quick alerts, and record when you have fed the fish. This records your action but does not operate a physical feeder.</p>
+        <div id="feedingAlert" class="feeding-alert" hidden><strong>⏰ Feeding check due!</strong><span>කෑම දෙන වේලාව ළඟයි. Fish feeding schedule review කරන්න.</span></div>
+      </div>
+      <div class="feeding-panel">
+        <div class="feeding-top"><span>🐠 FEEDING MANAGEMENT</span><span class="feeding-indicator" id="feedingIndicator">CHECKING</span></div>
+        <h3 id="feedingStatus">Loading feeding status...</h3>
+        <p id="feedingDetails">Your last feeding and next scheduled check will appear here.</p>
+        <label for="intervalSelect">Remind me after</label>
+        <select id="intervalSelect"><option value="6">6 hours</option><option value="8">8 hours</option><option value="12" selected>12 hours</option><option value="24">24 hours</option></select>
+        <button id="saveSchedule" class="schedule-btn" type="button">Save reminder schedule</button>
+        <button id="feedNow" class="feed-button" type="button">🍽 Feed Now · Mark as Fed</button>
+        <small>Confirmation required. No motor or automatic food dispensing is connected.</small>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="insights">
+    <div class="section-heading"><div><div class="eyebrow">04 / RESEARCH EXPLAINED</div><h2>Powerful AI. <em>Simple Answers.</em></h2><p>No complicated mathematics — just understand what the system does.</p></div></div>
+    <div class="explain-grid">
+      <div class="explain-card"><div>01 <span>🎥</span></div><h3>We look at your video</h3><p>The system reads frames from your recording and looks at changes from moment to moment.</p></div>
+      <div class="explain-card"><div>02 <span>🐟</span></div><h3>YOLO finds the fish</h3><p>Your trained model draws boxes around visible goldfish. The confidence slider controls which detections are shown.</p></div>
+      <div class="explain-card"><div>03 <span>⚡</span></div><h3>We measure movement</h3><p>Optical flow measures how much the image changes. This is an activity estimate, not a calibrated swimming speed.</p></div>
+      <div class="explain-card"><div>04 <span>📊</span></div><h3>We explain the behaviour</h3><p>Current movement is compared with your research baseline. Unusual movement alone does not prove hunger or illness.</p></div>
+    </div>
+    <div class="safety-info"><strong>Scientific transparency</strong><p>Fish count represents visible detections in sampled frames, not guaranteed unique animals. Movement results can be influenced by lighting, reflections or camera changes. Actual feeding motivation needs validated behavioural observations, and fish health needs appropriate care assessment.</p></div>
+  </section>
+</main>
+
+<footer class="site-footer"><div class="footer-flex"><div><strong>🐠 AQUAFEED <span>VISION</span></strong><p>A creative aquatic intelligence research experience.</p></div><div><a href="#studio">Video Studio</a><a href="#results">Analytics</a><a href="#feeding">Feeding Planner</a></div></div><div class="copyright">Independent AquaFeed Vision interface · Aquarium photographs via Unsplash · Inspired by aquatic ecommerce visual styles</div></footer>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden><span id="toastIcon">🔔</span><div><b id="toastTitle">Notification</b><small id="toastMessage"></small></div><button id="toastClose" type="button" aria-label="Dismiss notification">×</button></div>
+</body>
+</html>
