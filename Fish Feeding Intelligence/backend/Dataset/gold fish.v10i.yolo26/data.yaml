@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 1
+names: ['fish']
+
+roboflow:
+  workspace: yazz-hbuil
+  project: gold-fish-vkceq
+  version: 10
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/yazz-hbuil/gold-fish-vkceq/dataset/10
