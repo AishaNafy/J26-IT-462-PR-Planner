@@ -1,0 +1,14 @@
+{
+  "last_fed_at": "2026-10-21T07:24:35.446516+00:00",
+  "interval_hours": 6.0,
+  "events": [
+    {
+      "timestamp": "2026-10-19T18:54:02.671542+00:00",
+      "source": "user_confirmed"
+    },
+    {
+      "timestamp": "2026-10-21T07:24:35.446516+00:00",
+      "source": "user_confirmed"
+    }
+  ]
+}
