@@ -1,0 +1,6 @@
+{
+  "status": "SKIPPED",
+  "reason": "No verified four-class annotations available. Videos were not automatically assigned labels.",
+  "target": "Observed feeding-response intensity",
+  "is_hunger_ground_truth": false
+}
